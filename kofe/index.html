@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#191998">
+<title>Чашка кофе в ОМП</title>
+<link rel="icon" href="assets/mark_color.webp" type="image/webp">
+<link rel="preload" href="assets/fonts/TTNormsPro-Regular.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="assets/fonts/TTNormsPro-Medium.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="assets/fonts/TTNormsPro-Bold.woff2" as="font" type="font/woff2" crossorigin>
+<style>
+@font-face{font-family:"TT Norms Pro";src:url("assets/fonts/TTNormsPro-Regular.woff2") format("woff2");font-weight:400;font-style:normal;font-display:block}
+@font-face{font-family:"TT Norms Pro";src:url("assets/fonts/TTNormsPro-Medium.woff2") format("woff2");font-weight:500;font-style:normal;font-display:block}
+@font-face{font-family:"TT Norms Pro";src:url("assets/fonts/TTNormsPro-Bold.woff2") format("woff2");font-weight:700;font-style:normal;font-display:block}
+@font-face{font-family:"TT Norms Pro";src:url("assets/fonts/TTNormsPro-ExtraBold.woff2") format("woff2");font-weight:800;font-style:normal;font-display:block}
+
+:root{
+  --navy:#191998;
+  --deep:#0F1156;
+  --coral:#F53F44;
+  --blue:#176CFF;
+  --silver:#9CAAC2;
+  --card:rgba(255,255,255,.07);
+  --line:rgba(255,255,255,.12);
+  --text-2:rgba(255,255,255,.85);
+  --s:1;
+  --w:1280px;
+  --h:720px;
+}
+
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{
+  background:var(--deep);
+  color:#fff;
+  font-family:"TT Norms Pro",system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+  overflow:hidden;
+  overscroll-behavior:none;
+  -webkit-font-smoothing:antialiased;
+  -webkit-text-size-adjust:100%;
+}
+img,video{display:block}
+button{font:inherit;color:inherit}
+ol{list-style:none}
+
+.deck{
+  position:fixed;inset:0;overflow:hidden;
+  background:
+    radial-gradient(900px 620px at 18% -10%, rgba(23,108,255,.28), rgba(23,108,255,0) 62%),
+    linear-gradient(160deg,var(--navy) 0%,var(--deep) 100%);
+}
+
+/* два слоя одного масштаба: слайды и интерфейс */
+.hud,.stage{
+  position:absolute;left:50%;top:50%;
+  width:var(--w);height:var(--h);
+  transform:translate(-50%,-50%) scale(var(--s));
+  transform-origin:50% 50%;
+}
+
+.slide{
+  position:absolute;inset:0;z-index:1;
+  opacity:0;visibility:hidden;pointer-events:none;
+  transform:translateX(48px);
+  transition:opacity .45s ease,transform .45s cubic-bezier(.2,.7,.2,1),visibility 0s linear .45s;
+}
+.slide.is-prev{transform:translateX(-48px)}
+.slide.is-active{opacity:1;visibility:visible;pointer-events:auto;transform:none;transition-delay:0s}
+
+.stage{
+  padding:44px 48px 64px;
+  display:grid;
+  grid-template-columns:440px 1fr;
+  column-gap:36px;
+  align-items:center;
+}
+.col,.right{position:relative;z-index:1}
+
+/* боке: тайлы с альфой, растушевка маской; только над заголовком и за телефонами */
+.bokeh{
+  position:absolute;z-index:0;pointer-events:none;
+  background-position:center;background-size:contain;background-repeat:no-repeat;
+  -webkit-mask-image:radial-gradient(closest-side,#000 30%,transparent 75%);
+  mask-image:radial-gradient(closest-side,#000 30%,transparent 75%);
+}
+.b1{width:520px;height:520px;left:-170px;top:-240px;opacity:.75;background-image:url("assets/tile09_alpha.webp")}
+.b2{opacity:.55;background-image:url("assets/tile12_alpha.webp")}
+.s1 .b2{width:820px;height:820px;left:408px;top:-160px}
+.s2 .b1{background-image:url("assets/tile05_alpha.webp")}
+.s2 .b2{width:640px;height:640px;left:300px;top:-150px;background-image:url("assets/tile09_alpha.webp");transform:scaleX(-1)}
+.s3 .b1{width:480px;height:480px;left:-200px;top:-300px;background-image:url("assets/tile12_alpha.webp")}
+.s3 .b2{width:840px;height:840px;left:426px;top:-220px}
+
+/* левая колонка: номер, заголовок, тезис */
+.num{
+  position:relative;
+  font-weight:700;font-size:104px;line-height:.9;letter-spacing:-.02em;
+  color:#fff;
+}
+.rule{width:44px;height:4px;border-radius:2px;background:var(--coral);margin:14px 0 22px}
+h1{
+  font-weight:700;font-size:40px;line-height:1.06;letter-spacing:-.02em;
+  hyphens:manual;text-wrap:balance;
+}
+.lead{
+  margin-top:16px;max-width:420px;
+  font-weight:500;font-size:18px;line-height:1.2;
+  color:var(--text-2);
+}
+
+/* токены-монетки у номера */
+.tok{position:absolute;z-index:3;pointer-events:none;filter:drop-shadow(0 16px 22px rgba(0,0,0,.35))}
+.tok img{height:100%;width:auto}
+.tok1{height:272px;left:104px;top:-72px;animation:float 6s ease-in-out infinite}
+.tok2{height:196px;left:252px;top:-72px;animation:float 7s ease-in-out -2s infinite}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-9px)}}
+
+/* правая часть: телефоны на стеклянных карточках */
+.phones{display:flex;justify-content:center;align-items:stretch;gap:20px}
+.card{
+  background:var(--card);
+  border:1px solid var(--line);
+  border-radius:22px;
+  padding:10px;
+  display:flex;flex-direction:column;align-items:center;gap:8px;
+  box-shadow:0 24px 60px rgba(0,0,0,.22);
+}
+.screen{
+  width:236px;aspect-ratio:375/812;
+  border-radius:18px;overflow:hidden;
+  background:var(--deep);
+  box-shadow:0 0 0 1px rgba(255,255,255,.28),0 0 0 4px rgba(23,108,255,.22),0 16px 36px rgba(0,0,0,.35);
+  flex:none;
+}
+.screen video{width:100%;height:100%;object-fit:cover}
+.cap{
+  width:100%;padding:0 2px;
+  font-weight:500;font-size:16px;line-height:1.2;text-align:center;
+}
+.note{
+  margin-top:16px;text-align:center;
+  font-weight:500;font-size:17px;line-height:1.2;
+  color:var(--text-2);
+}
+
+/* слайд 2: один телефон и три шага */
+.s2 .right{display:grid;grid-template-columns:auto 1fr;gap:32px;align-items:center}
+.s2 .screen{width:260px}
+.steps{display:flex;flex-direction:column;gap:12px}
+.step{
+  background:var(--card);
+  border:1px solid var(--line);
+  border-radius:18px;
+  padding:14px 18px 14px 14px;
+  display:flex;align-items:center;gap:14px;
+  font-weight:500;font-size:17px;line-height:1.25;
+}
+.step b{
+  flex:0 0 36px;height:36px;border-radius:11px;
+  background:var(--coral);
+  display:grid;place-items:center;
+  font-weight:700;font-size:17px;line-height:1;
+}
+
+/* слайд 3: три телефона */
+.s3 .stage{grid-template-columns:372px 1fr;column-gap:32px}
+.s3 .phones{gap:18px}
+.s3 .screen{width:224px}
+.s3 .cap{min-height:3.6em;padding:0}
+
+/* интерфейс: логотип, колонтитул, навигация */
+.hud{pointer-events:none;z-index:2}
+.logo{position:absolute;left:48px;top:32px;width:156px}
+.logo img{width:100%;height:auto}
+.foot{
+  position:absolute;left:48px;bottom:22px;
+  display:flex;align-items:center;gap:26px;
+  font-size:14px;line-height:1.2;color:var(--silver);
+}
+.meta{display:flex;align-items:center;gap:12px;white-space:nowrap}
+.meta i{width:4px;height:4px;border-radius:50%;background:var(--silver);opacity:.7}
+.nav{display:flex;align-items:center;gap:10px;pointer-events:auto}
+.nav button{
+  width:34px;height:34px;border-radius:50%;
+  border:1px solid var(--line);background:var(--card);
+  cursor:pointer;display:grid;place-items:center;
+  transition:background .2s ease,opacity .2s ease;
+  -webkit-tap-highlight-color:transparent;
+}
+.nav button:hover{background:rgba(255,255,255,.16)}
+.nav button:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+.nav button[disabled]{opacity:.3;cursor:default}
+.nav button[disabled]:hover{background:var(--card)}
+.nav svg{width:16px;height:16px;fill:none;stroke:#fff;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.counter{min-width:44px;text-align:center;font-weight:500;color:#fff;font-variant-numeric:tabular-nums}
+
+/* телефон и ландшафт: столбец, прокрутка внутри слайда */
+@media (max-width:760px),(max-height:520px){
+  .hud{position:fixed;inset:0;left:0;top:0;width:auto;height:auto;transform:none}
+  .slide{overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;transform:translateX(24px)}
+  .slide.is-prev{transform:translateX(-24px)}
+  .slide.is-active{transform:none}
+  .stage{
+    position:relative;left:auto;top:auto;width:auto;height:auto;transform:none;
+    display:block;padding:72px 16px 100px;min-height:100%;
+  }
+  .b1,.s2 .b1,.s3 .b1{width:340px;height:340px;left:-150px;top:-190px;opacity:.7}
+  .b2{display:none}
+  .num{font-size:72px}
+  .rule{margin:10px 0 16px}
+  h1{font-size:27px}
+  .lead{font-size:16px;margin-top:12px;max-width:none}
+  .tok1{height:190px;left:auto;right:-12px;top:-46px}
+  .tok2{height:140px;left:auto;right:108px;top:-38px}
+  .right{margin-top:22px}
+  .phones,.s3 .phones{flex-direction:column;align-items:center;gap:14px}
+  .card{width:100%;max-width:358px;padding:12px;gap:10px}
+  .cap,.s3 .cap{order:-1;min-height:0;padding:2px 0 0;font-size:16px}
+  .screen,.s2 .screen,.s3 .screen{width:100%}
+  .note{font-size:16px;margin-top:16px}
+  .s2 .right{grid-template-columns:1fr;gap:16px;justify-items:center}
+  .steps{order:-1;width:100%;max-width:358px;gap:10px}
+  .step{padding:12px 14px;font-size:16px}
+  .step b{flex-basis:32px;height:32px;font-size:16px;border-radius:10px}
+
+  .logo{
+    left:0;right:0;top:0;width:auto;
+    padding:14px 16px 24px;
+    background:linear-gradient(180deg,rgba(25,25,152,.94) 0,rgba(25,25,152,.9) calc(100% - 24px),rgba(25,25,152,0) 100%);
+  }
+  .logo img{width:124px}
+  .foot{
+    left:0;right:0;bottom:0;gap:16px;justify-content:space-between;
+    padding:28px 16px calc(12px + env(safe-area-inset-bottom));
+    background:linear-gradient(180deg,rgba(15,17,86,0) 0,rgba(15,17,86,.9) 28px,rgba(15,17,86,.94) 100%);
+  }
+  .meta{flex-direction:column;align-items:flex-start;gap:3px;white-space:normal}
+  .meta i{display:none}
+  .nav button{width:40px;height:40px}
+}
+
+@media (prefers-reduced-motion:reduce){
+  .slide,.nav button{transition:none}
+  .tok1,.tok2{animation:none}
+}
+</style>
+</head>
+<body>
+<div class="deck">
+
+  <section class="slide s1" id="slide-1" aria-label="Слайд 1 из 3">
+    <div class="stage">
+      <div class="bokeh b1" aria-hidden="true"></div>
+      <div class="bokeh b2" aria-hidden="true"></div>
+      <div class="col">
+        <div class="num">01
+          <div class="tok tok1" aria-hidden="true"><img src="assets/token1.webp" alt=""></div>
+          <div class="tok tok2" aria-hidden="true"><img src="assets/token3.webp" alt=""></div>
+        </div>
+        <div class="rule"></div>
+        <h1>Эмоциональный дизайн в&nbsp;текущей стилистике ОМП</h1>
+      </div>
+      <div class="right">
+        <div class="phones">
+          <figure class="card">
+            <div class="screen">
+              <video src="video/v1-stakan.mp4" poster="video/v1-stakan.jpg" autoplay muted loop playsinline preload="metadata"></video>
+            </div>
+            <figcaption class="cap">Вариант 1. Стакан с&nbsp;собой</figcaption>
+          </figure>
+          <figure class="card">
+            <div class="screen">
+              <video src="video/v2-chashka.mp4" poster="video/v2-chashka.jpg" autoplay muted loop playsinline preload="metadata"></video>
+            </div>
+            <figcaption class="cap">Вариант 2. Чашка</figcaption>
+          </figure>
+        </div>
+        <p class="note">Пуш&nbsp;- экран с&nbsp;подарком&nbsp;- промокод в&nbsp;разделе "Выгода+"</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide s2" id="slide-2" aria-label="Слайд 2 из 3">
+    <div class="stage">
+      <div class="bokeh b1" aria-hidden="true"></div>
+      <div class="bokeh b2" aria-hidden="true"></div>
+      <div class="col">
+        <div class="num">02
+          <div class="tok tok1" aria-hidden="true"><img src="assets/token2.webp" alt=""></div>
+          <div class="tok tok2" aria-hidden="true"><img src="assets/token4.webp" alt=""></div>
+        </div>
+        <div class="rule"></div>
+        <h1>Как это может работать</h1>
+        <p class="lead">Не&nbsp;уводим в&nbsp;"Выгода+": промокод копируется на&nbsp;этом же&nbsp;экране, там&nbsp;же&nbsp;- как&nbsp;им воспользоваться</p>
+      </div>
+      <div class="right">
+        <figure class="card">
+          <div class="screen">
+            <video src="video/flow-code-on-screen.mp4" poster="video/flow-code-on-screen.jpg" autoplay muted loop playsinline preload="metadata"></video>
+          </div>
+        </figure>
+        <ol class="steps">
+          <li class="step"><b>1</b><span>Пуш с&nbsp;извинением.</span></li>
+          <li class="step"><b>2</b><span>Экран с&nbsp;подарком и&nbsp;промокодом.</span></li>
+          <li class="step"><b>3</b><span>Скопировать код и&nbsp;узнать, как&nbsp;воспользоваться.</span></li>
+        </ol>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide s3" id="slide-3" aria-label="Слайд 3 из 3">
+    <div class="stage">
+      <div class="bokeh b1" aria-hidden="true"></div>
+      <div class="bokeh b2" aria-hidden="true"></div>
+      <div class="col">
+        <div class="num">03
+          <div class="tok tok1" aria-hidden="true"><img src="assets/token3.webp" alt=""></div>
+          <div class="tok tok2" aria-hidden="true"><img src="assets/token1.webp" alt=""></div>
+        </div>
+        <div class="rule"></div>
+        <h1>Эмоциональный дизайн в&nbsp;новой стратегии коммуникации. Умные&nbsp;пуши</h1>
+        <p class="lead">Такие анимации должны визуально отличаться от&nbsp;обычных коммуникаций и&nbsp;замечаться пользователем. Прорабатываем в&nbsp;задачах "Умный&nbsp;онбординг" и&nbsp;"Умные&nbsp;пуши"</p>
+      </div>
+      <div class="right">
+        <div class="phones">
+          <figure class="card">
+            <div class="screen">
+              <video src="video/smart-cat-salary.mp4" poster="video/smart-cat-salary.jpg" autoplay muted loop playsinline preload="metadata"></video>
+            </div>
+            <figcaption class="cap">Кот на&nbsp;главной: деньги пришли на&nbsp;Халву, предлагаем отложить в&nbsp;копилку</figcaption>
+          </figure>
+          <figure class="card">
+            <div class="screen">
+              <video src="video/smart-push-birthday.mp4" poster="video/smart-push-birthday.jpg" autoplay muted loop playsinline preload="metadata"></video>
+            </div>
+            <figcaption class="cap">Умный пуш: день рождения</figcaption>
+          </figure>
+          <figure class="card">
+            <div class="screen">
+              <video src="video/smart-push-capsule.mp4" poster="video/smart-push-capsule.jpg" autoplay muted loop playsinline preload="metadata"></video>
+            </div>
+            <figcaption class="cap">Умный пуш: зарплата пришла, отложить в&nbsp;копилку</figcaption>
+          </figure>
+        </div>
+        <p class="note">Умный пуш живет внизу главной над&nbsp;таб-баром и&nbsp;раскрывается в&nbsp;полноэкранную сцену</p>
+      </div>
+    </div>
+  </section>
+
+  <div class="hud">
+    <div class="logo"><img src="assets/logo_white_coral.webp" alt="Совкомбанк"></div>
+    <div class="foot">
+      <div class="meta"><span>Чашка кофе в&nbsp;ОМП</span><i></i><span>30.09.2026</span></div>
+      <div class="nav">
+        <button class="prev" type="button" aria-label="Предыдущий слайд"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M10 3 5 8l5 5"/></svg></button>
+        <span class="counter"><b>1</b> / 3</span>
+        <button class="next" type="button" aria-label="Следующий слайд"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="m6 3 5 5-5 5"/></svg></button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  var W=1280, H=720;
+
+  var root=document.documentElement;
+  var deck=document.querySelector('.deck');
+  var slides=[].slice.call(document.querySelectorAll('.slide'));
+  var total=slides.length, cur=-1;
+  var counter=document.querySelector('.counter b');
+  var prevBtn=document.querySelector('.nav .prev');
+  var nextBtn=document.querySelector('.nav .next');
+  var mobile=window.matchMedia('(max-width:760px),(max-height:520px)');
+
+  function fit(){
+    if(mobile.matches){ root.style.setProperty('--s','1'); return; }
+    var s=Math.min(window.innerWidth/W, window.innerHeight/H);
+    root.style.setProperty('--s', s.toFixed(4));
+  }
+
+  function fromHash(){
+    var n=parseInt((location.hash||'').replace('#',''),10);
+    return (n>=1 && n<=total) ? n-1 : 0;
+  }
+
+  function syncVideos(){
+    slides.forEach(function(s,i){
+      [].forEach.call(s.querySelectorAll('video'),function(v){
+        if(i===cur){
+          v.muted=true;
+          var p=v.play();
+          if(p && p.catch) p.catch(function(){});
+        }else{
+          v.pause();
+        }
+      });
+    });
+  }
+
+  function go(n){
+    n=Math.max(0,Math.min(total-1,n));
+    if(n===cur) return;
+    slides.forEach(function(s,i){
+      s.classList.toggle('is-active',i===n);
+      s.classList.toggle('is-prev',i<n);
+      s.setAttribute('aria-hidden', i===n ? 'false' : 'true');
+      if(i===n) s.scrollTop=0;
+    });
+    cur=n;
+    counter.textContent=String(n+1);
+    prevBtn.disabled=(n===0);
+    nextBtn.disabled=(n===total-1);
+    if(location.hash!=='#'+(n+1)) history.replaceState(null,'','#'+(n+1));
+    syncVideos();
+  }
+
+  prevBtn.addEventListener('click',function(){ go(cur-1); this.blur(); });
+  nextBtn.addEventListener('click',function(){ go(cur+1); this.blur(); });
+
+  window.addEventListener('keydown',function(e){
+    if(e.altKey||e.ctrlKey||e.metaKey) return;
+    var onButton=e.target && e.target.tagName==='BUTTON';
+    switch(e.key){
+      case 'ArrowRight': case 'PageDown': e.preventDefault(); go(cur+1); break;
+      case 'ArrowLeft': case 'PageUp': e.preventDefault(); go(cur-1); break;
+      case ' ': if(!onButton){ e.preventDefault(); go(cur+1); } break;
+      case 'Home': e.preventDefault(); go(0); break;
+      case 'End': e.preventDefault(); go(total-1); break;
+    }
+  });
+
+  var tx=0, ty=0, tt=0;
+  deck.addEventListener('touchstart',function(e){
+    var t=e.changedTouches[0]; tx=t.clientX; ty=t.clientY; tt=Date.now();
+  },{passive:true});
+  deck.addEventListener('touchend',function(e){
+    var t=e.changedTouches[0];
+    var dx=t.clientX-tx, dy=t.clientY-ty;
+    if(Math.abs(dx)>50 && Math.abs(dx)>Math.abs(dy)*1.3 && Date.now()-tt<800){
+      go(dx<0 ? cur+1 : cur-1);
+    }
+  },{passive:true});
+
+  /* если автозапуск заблокирован, первое касание запускает ролики */
+  window.addEventListener('touchstart',syncVideos,{once:true,passive:true});
+  window.addEventListener('click',syncVideos,{once:true});
+  document.addEventListener('visibilitychange',function(){ if(!document.hidden) syncVideos(); });
+
+  window.addEventListener('hashchange',function(){ go(fromHash()); });
+  window.addEventListener('resize',fit);
+  window.addEventListener('orientationchange',function(){ setTimeout(fit,120); });
+  if(mobile.addEventListener) mobile.addEventListener('change',fit);
+  else if(mobile.addListener) mobile.addListener(fit);
+
+  fit();
+  go(fromHash());
+})();
+</script>
+</body>
+</html>
