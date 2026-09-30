@@ -284,12 +284,14 @@ h1{
       <div class="bokeh b1" aria-hidden="true"></div>
       <div class="bokeh b2" aria-hidden="true"></div>
       <div class="col">
+        <span class="kicker">Базовый сценарий</span>
         <div class="num">01
           <div class="tok tok1" aria-hidden="true"><img src="assets/token1.webp" alt=""></div>
           <div class="tok tok2" aria-hidden="true"><img src="assets/token3.webp" alt=""></div>
         </div>
         <div class="rule"></div>
-        <h1>Эмоциональный дизайн в&nbsp;текущей стилистике ОМП</h1>
+        <h1>Два образа подарка: стакан или&nbsp;чашка</h1>
+        <p class="lead">Путь как&nbsp;в&nbsp;пилоте: пуш с&nbsp;извинением, экран с&nbsp;подарком, промокод лежит в&nbsp;разделе "Выгода+". Здесь выбираем только образ.</p>
       </div>
       <div class="right">
         <div class="phones">
@@ -306,7 +308,7 @@ h1{
             <figcaption class="cap">Вариант 2. Чашка</figcaption>
           </figure>
         </div>
-        <p class="note">Пуш&nbsp;- экран с&nbsp;подарком&nbsp;- промокод в&nbsp;разделе "Выгода+"</p>
+        <p class="note">Пуш&nbsp;- экран с&nbsp;подарком&nbsp;- "Перейти к&nbsp;промокоду"&nbsp;- раздел "Выгода+"&nbsp;- код</p>
       </div>
     </div>
   </section>
@@ -316,13 +318,14 @@ h1{
       <div class="bokeh b1" aria-hidden="true"></div>
       <div class="bokeh b2" aria-hidden="true"></div>
       <div class="col">
+        <span class="kicker">Короткий сценарий</span>
         <div class="num">02
           <div class="tok tok1" aria-hidden="true"><img src="assets/token2.webp" alt=""></div>
           <div class="tok tok2" aria-hidden="true"><img src="assets/token4.webp" alt=""></div>
         </div>
         <div class="rule"></div>
-        <h1>Как это может работать</h1>
-        <p class="lead">Не&nbsp;уводим в&nbsp;"Выгода+": промокод копируется на&nbsp;этом же&nbsp;экране, там&nbsp;же&nbsp;- как&nbsp;им воспользоваться</p>
+        <h1>Промокод сразу на&nbsp;экране подарка</h1>
+        <p class="lead">Не&nbsp;уводим клиента в&nbsp;"Выгода+": код виден на&nbsp;том&nbsp;же экране, копируется одним тапом, рядом&nbsp;- как&nbsp;им воспользоваться. До&nbsp;скопированного кода 2&nbsp;экрана и&nbsp;2&nbsp;тапа вместо&nbsp;4&nbsp;и&nbsp;4.</p>
       </div>
       <div class="right">
         <figure class="card">
@@ -332,8 +335,8 @@ h1{
         </figure>
         <ol class="steps">
           <li class="step"><b>1</b><span>Пуш с&nbsp;извинением.</span></li>
-          <li class="step"><b>2</b><span>Экран с&nbsp;подарком и&nbsp;промокодом.</span></li>
-          <li class="step"><b>3</b><span>Скопировать код и&nbsp;узнать, как&nbsp;воспользоваться.</span></li>
+          <li class="step"><b>2</b><span>Экран с&nbsp;подарком, промокод уже на&nbsp;нем.</span></li>
+          <li class="step"><b>3</b><span>Скопировать одним тапом и&nbsp;узнать, как&nbsp;воспользоваться.</span></li>
         </ol>
       </div>
     </div>
@@ -406,6 +409,11 @@ h1{
   var slides=[].slice.call(document.querySelectorAll('.slide'));
   var total=slides.length, cur=-1;
   var counter=document.querySelector('.counter b');
+  var titles=[
+    '1 из 3. Базовый сценарий: стакан или чашка',
+    '2 из 3. Короткий сценарий: промокод на экране',
+    '3 из 3. Дополнительно: умные пуши'
+  ];
   var prevBtn=document.querySelector('.nav .prev');
   var nextBtn=document.querySelector('.nav .next');
   var mobile=window.matchMedia('(max-width:760px),(max-height:520px)');
@@ -446,6 +454,7 @@ h1{
     });
     cur=n;
     counter.textContent=String(n+1);
+    document.title=titles[n]||'Чашка кофе в ОМП';
     prevBtn.disabled=(n===0);
     nextBtn.disabled=(n===total-1);
     if(location.hash!=='#'+(n+1)) history.replaceState(null,'','#'+(n+1));
