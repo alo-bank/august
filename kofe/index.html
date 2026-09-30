@@ -163,11 +163,37 @@ h1{
   font-weight:700;font-size:17px;line-height:1;
 }
 
-/* слайд 3: три телефона */
+/* слайд 3: три телефона, слева кикер, тезис и три аргумента */
 .s3 .stage{grid-template-columns:372px 1fr;column-gap:32px}
 .s3 .phones{gap:18px}
 .s3 .screen{width:224px}
-.s3 .cap{min-height:3.6em;padding:0}
+.s3 .cap{min-height:2.4em;padding:0}
+.s3 .num{font-size:84px}
+.s3 .rule{margin:12px 0 16px}
+.s3 h1{font-size:30px}
+.s3 .lead{font-size:15px;margin-top:12px}
+.s3 .tok1{height:236px;left:96px;top:-70px}
+.s3 .tok2{height:170px;left:226px;top:-66px}
+.kicker{
+  display:inline-block;margin-bottom:10px;
+  font-weight:500;font-size:14px;line-height:1.2;letter-spacing:.06em;text-transform:uppercase;
+  color:var(--coral);
+}
+.args{margin-top:14px;display:flex;flex-direction:column;gap:8px}
+.arg{
+  background:var(--card);
+  border:1px solid var(--line);
+  border-radius:14px;
+  padding:8px 12px 8px 9px;
+  display:flex;align-items:center;gap:10px;
+  font-weight:500;font-size:14px;line-height:1.2;
+}
+.arg b{
+  flex:0 0 26px;height:26px;border-radius:8px;
+  background:var(--coral);
+  display:grid;place-items:center;
+  font-weight:700;font-size:14px;line-height:1;
+}
 
 /* интерфейс: логотип, колонтитул, навигация */
 .hud{pointer-events:none;z-index:2}
@@ -223,6 +249,10 @@ h1{
   .steps{order:-1;width:100%;max-width:358px;gap:10px}
   .step{padding:12px 14px;font-size:16px}
   .step b{flex-basis:32px;height:32px;font-size:16px;border-radius:10px}
+  .s3 h1{font-size:27px}
+  .s3 .lead{font-size:16px}
+  .args{margin-top:14px;gap:8px}
+  .arg{font-size:15px}
 
   .logo{
     left:0;right:0;top:0;width:auto;
@@ -314,13 +344,19 @@ h1{
       <div class="bokeh b1" aria-hidden="true"></div>
       <div class="bokeh b2" aria-hidden="true"></div>
       <div class="col">
+        <span class="kicker">Дополнительно</span>
         <div class="num">03
           <div class="tok tok1" aria-hidden="true"><img src="assets/token3.webp" alt=""></div>
           <div class="tok tok2" aria-hidden="true"><img src="assets/token1.webp" alt=""></div>
         </div>
         <div class="rule"></div>
-        <h1>Эмоциональный дизайн в&nbsp;новой стратегии коммуникации. Умные&nbsp;пуши</h1>
-        <p class="lead">Такие анимации должны визуально отличаться от&nbsp;обычных коммуникаций и&nbsp;замечаться пользователем. Прорабатываем в&nbsp;задачах "Умный&nbsp;онбординг" и&nbsp;"Умные&nbsp;пуши"</p>
+        <h1>Эмоциональный дизайн как&nbsp;отдельный язык коммуникаций ОМП</h1>
+        <p class="lead">Сегодня все сообщения в&nbsp;приложении выглядят одинаково: баннер, шторка, пуш. Предлагаем закрепить за&nbsp;эмоциональными событиями свой язык&nbsp;- объем, движение, персонаж&nbsp;- и&nbsp;не&nbsp;использовать его в&nbsp;рекламе, чтобы он&nbsp;оставался заметным.</p>
+        <ol class="args">
+          <li class="arg"><b>1</b><span>Замечается: за&nbsp;счет 3D и&nbsp;анимации событие выделяется среди офферов.</span></li>
+          <li class="arg"><b>2</b><span>Уместно: показываем в&nbsp;момент события&nbsp;- зарплата, праздник, возврат комиссии.</span></li>
+          <li class="arg"><b>3</b><span>Измеримо: у&nbsp;каждой сцены одно действие, по&nbsp;нему считаем эффект.</span></li>
+        </ol>
       </div>
       <div class="right">
         <div class="phones">
@@ -328,22 +364,22 @@ h1{
             <div class="screen">
               <video src="video/smart-cat-salary.mp4" poster="video/smart-cat-salary.jpg" autoplay muted loop playsinline preload="metadata"></video>
             </div>
-            <figcaption class="cap">Кот на&nbsp;главной: деньги пришли на&nbsp;Халву, предлагаем отложить в&nbsp;копилку</figcaption>
+            <figcaption class="cap">Деньги пришли: кот предлагает отложить в&nbsp;копилку</figcaption>
           </figure>
           <figure class="card">
             <div class="screen">
               <video src="video/smart-push-birthday.mp4" poster="video/smart-push-birthday.jpg" autoplay muted loop playsinline preload="metadata"></video>
             </div>
-            <figcaption class="cap">Умный пуш: день рождения</figcaption>
+            <figcaption class="cap">День рождения: поздравление и&nbsp;шарики</figcaption>
           </figure>
           <figure class="card">
             <div class="screen">
               <video src="video/smart-push-capsule.mp4" poster="video/smart-push-capsule.jpg" autoplay muted loop playsinline preload="metadata"></video>
             </div>
-            <figcaption class="cap">Умный пуш: зарплата пришла, отложить в&nbsp;копилку</figcaption>
+            <figcaption class="cap">Зарплата: отложить 500&nbsp;₽ одним тапом</figcaption>
           </figure>
         </div>
-        <p class="note">Умный пуш живет внизу главной над&nbsp;таб-баром и&nbsp;раскрывается в&nbsp;полноэкранную сцену</p>
+        <p class="note">Прорабатываем в&nbsp;задачах "Умный&nbsp;онбординг" (релиз&nbsp;62) и&nbsp;"Умные&nbsp;пуши", концепцию покажем на&nbsp;ближайшем комитете</p>
       </div>
     </div>
   </section>
